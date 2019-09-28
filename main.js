@@ -285,7 +285,6 @@ function updateBoardDims(x, y, set = false) {
 	} else {
 		currentDims = [x, y];
 	}
-	gameOver = true;
 	timer = false;
 	game = gameGen(currentDims, Math.floor((currentDims[0] * currentDims[1]) / 10));
 	bombs = game[1];
