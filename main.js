@@ -232,7 +232,7 @@ function drawOptions() {
 	let xTextSize = optionsRect[2]/10;
 	ctx.font = `${xTextSize}px Comic Sans`;
 	ctx.fillText('Timer', (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 9, scaleRect[1] + scaleRect[3] * (0.6 + 5.75));
-	ctx.fillText(`00:00.000`, (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 5, scaleRect[1] + scaleRect[3] * (0.6 + 6.5));
+	if(!timer)ctx.fillText(`00:00.000`, (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 5, scaleRect[1] + scaleRect[3] * (0.6 + 6.5));
 
 	let labels = ['Width', 'Height', 'Bomb Count'];
 
@@ -308,11 +308,11 @@ function drawTimer() {
 	let xTextSize = optionsRect[2]/10;
 
 	ctx.fillStyle = '#c6c6c6';
-	ctx.fillRect((scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 4.5, scaleRect[1] + scaleRect[3] * 6.5, xTextSize*7, scaleRect[3]-60);
+	ctx.fillRect((scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 4.5, scaleRect[1] + scaleRect[3] * 6.5, xTextSize*7, scaleRect[3]*0.75);
 
 	ctx.fillStyle = '#000000';
 	ctx.font = `${xTextSize}px Comic Sans`;
-	ctx.fillText(`${minutes}:${seconds}.${milliseconds}`, (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 4.5, scaleRect[1] + scaleRect[3] * (0.6 + 6.5));
+	ctx.fillText(`${minutes}:${seconds}.${milliseconds}`, (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 5, scaleRect[1] + scaleRect[3] * (0.6 + 6.5));
 	if(timer) setTimeout(requestAnimationFrame(drawTimer), 10);
 }
 
