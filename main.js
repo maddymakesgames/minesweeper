@@ -4,11 +4,11 @@ const bombImage = document.getElementById('bomb');
 const flagImage = document.getElementById('flag');
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
-let game = [];
+let game;
 let bombs = [];
 let revealed = [];
 let currentDims = [30, 30]
-let bombCount = 0;
+let bombCount = 90;
 const bgColor = '#343434'
 let gameOver = false;
 let xPixels;
@@ -28,10 +28,7 @@ let scaleRect = [optionsRect[0] + (optionsRect[2] / 32), optionsRect[1] + (optio
 })()
 
 function startGame() {
-	game = gameGen(currentDims, Math.floor((currentDims[0] * currentDims[1]) / 10));
-	bombs = game[1];
-	game = game[0];
-	for (let i = 0; i < game.length; i++) {
+	for (let i = 0; i < currentDims[1]; i++) {
 		revealed[i] = []
 	}
 }
@@ -56,8 +53,8 @@ function drawBoard() {
 	let xPixels = gameRect[2] / currentDims[0];
 	let yPixels = gameRect[3] / currentDims[1];
 
-	for (let i = 0; i < game.length; i++) {
-		for (let e = 0; e < game[i].length; e++) {
+	for (let i = 0; i < currentDims[1]; i++) {
+		for (let e = 0; e < currentDims[0]; e++) {
 			if (!revealed[i][e]) ctx.drawImage(tileImage, (xPixels * e) + gameRect[0], (i * yPixels) + gameRect[1], xPixels, yPixels);
 			else if (revealed[i][e] == 'flag') {
 				ctx.drawImage(tileImage, (xPixels * e) + gameRect[0], (i * yPixels) + gameRect[1], xPixels, yPixels);
@@ -82,6 +79,7 @@ window.onresize = updateSize;
  */
 canvas.onclick = (event) => {
 	if (gameOver) {
+		game = undefined;
 		startGame();
 		updateSize();
 		gameOver = false;
@@ -91,6 +89,12 @@ canvas.onclick = (event) => {
 	let rawMouseY = event.clientY;
 
 	if (rawMouseX - gameRect[0] <= gameRect[2] && rawMouseX - gameRect[0] > 0 && rawMouseY - gameRect[1] < gameRect[3] && rawMouseY - gameRect[1] > 0) {
+		console.log();
+		if(!game) {
+			game = gameGen(currentDims, bombCount);
+			bombs = game[1];
+			game = game[0];
+		}
 		let mouseGridX = Math.floor((rawMouseX - gameRect[0]) / xPixels);
 		let mouseGridY = Math.floor((rawMouseY - gameRect[1]) / yPixels);
 		if(!timer) {
@@ -231,41 +235,34 @@ function drawOptions() {
 	ctx.fillStyle = '#000000';
 	let xTextSize = optionsRect[2]/10;
 	ctx.font = `${xTextSize}px Comic Sans`;
-	ctx.fillText('Timer', (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 9, scaleRect[1] + scaleRect[3] * (0.6 + 4));
-	ctx.fillText(`00:00.000`, (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 5, scaleRect[1] + scaleRect[3] * (0.6 + 5));
+	ctx.fillText('Timer', (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 9, scaleRect[1] + scaleRect[3] * (0.6 + 5.75));
+	ctx.fillText(`00:00.000`, (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 5, scaleRect[1] + scaleRect[3] * (0.6 + 6.5));
 
-	let labels = ['Width', 'Height'];
+	let labels = ['Width', 'Height', 'Bomb Count'];
 
-	for (let rectNum = 0; rectNum < 2; rectNum++) {
+	for (let rectNum = 0; rectNum < 3; rectNum++) {
 		ctx.fillStyle = '#67d501';
-		ctx.fillRect(scaleRect[0], scaleRect[1] + scaleRect[3] * ((rectNum * 2) + 1), scaleRect[2], scaleRect[3]);
+		ctx.fillRect(scaleRect[0], scaleRect[1] + scaleRect[3] * ((rectNum * 1.6) + 1), scaleRect[2], scaleRect[3]);
 
 		for (let i = 0; i < 3; i++) {
 			ctx.fillStyle = '#000000';
-			ctx.rect(scaleRect[0] + ((scaleRect[2]) / 3) * i, scaleRect[1] + (scaleRect[3]) * ((rectNum * 2) + 1), (scaleRect[2]) / 3, scaleRect[3]);
+			ctx.rect(scaleRect[0] + ((scaleRect[2]) / 3) * i, scaleRect[1] + (scaleRect[3]) * ((rectNum * 1.6) + 1), (scaleRect[2]) / 3, scaleRect[3]);
 
 		}
 		ctx.stroke();
 
 		ctx.font = `${((optionsRect[2] / 32)*30)/12}px Comic Sans`;
-		ctx.fillText('-', (scaleRect[0]) * 1.04, scaleRect[1] + scaleRect[3] * (0.6 + (rectNum * 2) + 1));
-		ctx.fillText('+', (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3) * 2, scaleRect[1] + scaleRect[3] * (0.6 + (rectNum * 2) + 1));
+		ctx.fillText('-', (scaleRect[0]) * 1.04, scaleRect[1] + scaleRect[3] * (0.6 + (rectNum * 1.6) + 1));
+		ctx.fillText('+', (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3) * 2, scaleRect[1] + scaleRect[3] * (0.6 + (rectNum * 1.6) + 1));
 
-		xTextSize = ((optionsRect[2] / 32) * 15) / (currentDims[rectNum].toString().length * 2);
+		let textToDisplay = rectNum==2 ? bombCount : currentDims[rectNum];
+		xTextSize = 32/(optionsRect[2]/512);
 		ctx.font = `${xTextSize}px Comic Sans`;
-		ctx.fillText(currentDims[rectNum], (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3) - (currentDims[0].toString().length * xTextSize) / 5, scaleRect[1] + scaleRect[3] * (0.6 + (rectNum * 2) + 1));
+		ctx.fillText(textToDisplay, (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3) - (textToDisplay.toString().length * xTextSize) / 5, scaleRect[1] + scaleRect[3] * (0.6 + (rectNum * 1.6) + 1));
 
-		xTextSize = ((optionsRect[2] / 32) * 15) / (labels[rectNum].toString().length);
+		xTextSize = 32/(optionsRect[2]/512);
 		ctx.font = `${xTextSize}px Comic Sans`;
-		ctx.fillText(labels[rectNum], (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (labels[rectNum].toString().length * xTextSize) / 5, scaleRect[1] + scaleRect[3] * (0.6 + (rectNum * 2)));
-	}
-}
-
-function updateOptions() {
-	for (let rectNum = 0; rectNum < 2; rectNum++) {
-		let xTextSize = ((optionsRect[2] / 32) * 15) / (currentDims[rectNum].toString().length * 2);
-		ctx.font = `${xTextSize}px Comic Sans`;
-		ctx.fillText(currentDims[rectNum], (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3) - (currentDims[0].toString().length * xTextSize) / 5, scaleRect[1] + scaleRect[3] * (0.6 + (rectNum * 2) + 1));
+		ctx.fillText(labels[rectNum], (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (labels[rectNum].toString().length * xTextSize) / 5, scaleRect[1] + scaleRect[3] * (0.6 + (rectNum * 1.7)));
 	}
 }
 
@@ -274,27 +271,33 @@ function optionsClick(x, y) {
 	if (x - scaleRect[0] > 0 && x - scaleRect[0] < updateSizeWidth && y - scaleRect[1] - scaleRect[3] < scaleRect[3] && y - scaleRect[1] - scaleRect[3] > 0) updateBoardDims(-1, 0);
 	if (x - scaleRect[0] - (updateSizeWidth * 2) > 0 && x - scaleRect[0] - (updateSizeWidth * 2) < updateSizeWidth && y - scaleRect[1] - scaleRect[3] < scaleRect[3] && y - scaleRect[1] - scaleRect[3] > 0) updateBoardDims(1, 0);
 
-	if (x - scaleRect[0] > 0 && x - scaleRect[0] < updateSizeWidth && y - scaleRect[1] - (scaleRect[3] * 3) < scaleRect[3] && y - scaleRect[1] - (scaleRect[3] * 3) > 0) updateBoardDims(0, -1);
-	if (x - scaleRect[0] - (updateSizeWidth * 2) > 0 && x - scaleRect[0] - (updateSizeWidth * 3) < updateSizeWidth && y - scaleRect[1] - (scaleRect[3] * 3) < scaleRect[3] && y - scaleRect[1] - (scaleRect[3] * 3) > 0) updateBoardDims(0, 1);
+	if (x - scaleRect[0] > 0 && x - scaleRect[0] < updateSizeWidth && y - scaleRect[1] - (scaleRect[3] * 2.6) < scaleRect[3] && y - scaleRect[1] - (scaleRect[3] * 2.6) > 0) updateBoardDims(0, -1);
+	if (x - scaleRect[0] - (updateSizeWidth * 2) > 0 && x - scaleRect[0] - (updateSizeWidth * 3) < updateSizeWidth && y - scaleRect[1] - (scaleRect[3] * 2.6) < scaleRect[3] && y - scaleRect[1] - (scaleRect[3] * 2.6) > 0) updateBoardDims(0, 1);
+
+	if (x - scaleRect[0] > 0 && x - scaleRect[0] < updateSizeWidth && y - scaleRect[1] - (scaleRect[3] * 4.2) < scaleRect[3] && y - scaleRect[1] - (scaleRect[3] * 4.2) > 0) updateBombCount(-1);
+	if (x - scaleRect[0] - (updateSizeWidth * 2) > 0 && x - scaleRect[0] - (updateSizeWidth * 3) < updateSizeWidth && y - scaleRect[1] - (scaleRect[3] * 4.2) < scaleRect[3] && y - scaleRect[1] - (scaleRect[3] * 4.2) > 0) updateBombCount(1);
 }
 
-function updateBoardDims(x, y, set = false) {
-	if (!set) {
-		currentDims[0] += x;
-		currentDims[1] += y;
-	} else {
-		currentDims = [x, y];
-	}
+function updateBoardDims(x, y) {
+	currentDims[0] += x;
+	currentDims[1] += y;
+
 	timer = false;
-	game = gameGen(currentDims, Math.floor((currentDims[0] * currentDims[1]) / 10));
-	bombs = game[1];
-	game = game[0];
+	if(bombCount > (currentDims[0]*currentDims[1])/6) while(bombCount > (currentDims[0]*currentDims[1])/6) {bombCount--;}
+	for (let i = 0; i < currentDims[1]; i++) {
+		revealed[i] = []
+	}
+	updateSize();
+}
+
+function updateBombCount(num) {
+	bombCount += num;
+
+	if(bombCount > (currentDims[0]*currentDims[1])/6) while(bombCount > (currentDims[0]*currentDims[1])/6) {bombCount--;}
 	for (let i = 0; i < game.length; i++) {
 		revealed[i] = []
 	}
 	updateSize();
-	requestAnimationFrame(drawBoard);
-	requestAnimationFrame(updateOptions);
 }
 
 function startTimer() {
@@ -313,11 +316,11 @@ function drawTimer() {
 	let xTextSize = optionsRect[2]/10;
 
 	ctx.fillStyle = '#c6c6c6';
-	ctx.fillRect((scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 4.5, scaleRect[1] + scaleRect[3] * 5, xTextSize*7, 70);
+	ctx.fillRect((scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 4.5, scaleRect[1] + scaleRect[3] * 6.5, xTextSize*7, 70);
 
 	ctx.fillStyle = '#000000';
 	ctx.font = `${xTextSize}px Comic Sans`;
-	ctx.fillText(`${minutes}:${seconds}.${milliseconds}`, (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 4.5, scaleRect[1] + scaleRect[3] * (0.6 + 5));
+	ctx.fillText(`${minutes}:${seconds}.${milliseconds}`, (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 4.5, scaleRect[1] + scaleRect[3] * (0.6 + 6.5));
 	if(timer) setTimeout(requestAnimationFrame(drawTimer), 10);
 }
 
