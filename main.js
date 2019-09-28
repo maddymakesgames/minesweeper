@@ -4,7 +4,7 @@ const bombImage = document.getElementById('bomb');
 const flagImage = document.getElementById('flag');
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
-let game;
+let game = false;
 let bombs = [];
 let revealed = [];
 let currentDims = [30, 30]
@@ -50,9 +50,6 @@ function updateSize() {
 }
 
 function drawBoard() {
-	let xPixels = gameRect[2] / currentDims[0];
-	let yPixels = gameRect[3] / currentDims[1];
-
 	for (let i = 0; i < currentDims[1]; i++) {
 		for (let e = 0; e < currentDims[0]; e++) {
 			if (!revealed[i][e]) ctx.drawImage(tileImage, (xPixels * e) + gameRect[0], (i * yPixels) + gameRect[1], xPixels, yPixels);
@@ -65,7 +62,7 @@ function drawBoard() {
 				} else if (game[i][e] != 0) {
 					ctx.font = `${xPixels*0.75}px Comic Sans`;
 					ctx.fillStyle = '#00FFFF';
-					ctx.fillText(game[i][e], (xPixels * e) + gameRect[0] + xPixels * 0.25, ((i + 1) * yPixels) + gameRect[1] + yPixels * -0.2);
+					ctx.fillText(game[i][e], (xPixels * e) + gameRect[0] + xPixels * 0.25, ((i + 1) * yPixels) + gameRect[1] + yPixels * -0.05);
 				}
 			}
 		}
@@ -79,7 +76,7 @@ window.onresize = updateSize;
  */
 canvas.onclick = (event) => {
 	if (gameOver) {
-		game = undefined;
+		game = false;
 		startGame();
 		updateSize();
 		gameOver = false;
@@ -89,7 +86,6 @@ canvas.onclick = (event) => {
 	let rawMouseY = event.clientY;
 
 	if (rawMouseX - gameRect[0] <= gameRect[2] && rawMouseX - gameRect[0] > 0 && rawMouseY - gameRect[1] < gameRect[3] && rawMouseY - gameRect[1] > 0) {
-		console.log();
 		if(!game) {
 			game = gameGen(currentDims, bombCount);
 			bombs = game[1];
@@ -256,12 +252,9 @@ function drawOptions() {
 		ctx.fillText('+', (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3) * 2, scaleRect[1] + scaleRect[3] * (0.6 + (rectNum * 1.6) + 1));
 
 		let textToDisplay = rectNum==2 ? bombCount : currentDims[rectNum];
-		xTextSize = 32/(optionsRect[2]/512);
+		xTextSize = (gameRect[3] / 30)*1.5;
 		ctx.font = `${xTextSize}px Comic Sans`;
 		ctx.fillText(textToDisplay, (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3) - (textToDisplay.toString().length * xTextSize) / 5, scaleRect[1] + scaleRect[3] * (0.6 + (rectNum * 1.6) + 1));
-
-		xTextSize = 32/(optionsRect[2]/512);
-		ctx.font = `${xTextSize}px Comic Sans`;
 		ctx.fillText(labels[rectNum], (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (labels[rectNum].toString().length * xTextSize) / 5, scaleRect[1] + scaleRect[3] * (0.6 + (rectNum * 1.7)));
 	}
 }
@@ -315,7 +308,7 @@ function drawTimer() {
 	let xTextSize = optionsRect[2]/10;
 
 	ctx.fillStyle = '#c6c6c6';
-	ctx.fillRect((scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 4.5, scaleRect[1] + scaleRect[3] * 6.5, xTextSize*7, 70);
+	ctx.fillRect((scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3.25) - (10 * xTextSize) / 4.5, scaleRect[1] + scaleRect[3] * 6.5, xTextSize*7, scaleRect[3]-60);
 
 	ctx.fillStyle = '#000000';
 	ctx.font = `${xTextSize}px Comic Sans`;
@@ -325,7 +318,7 @@ function drawTimer() {
 
 function drawStroked(text, x, y, color) {
     ctx.strokeStyle = 'black';
-    ctx.lineWidth = 8;
+    ctx.lineWidth = 1;
     ctx.lineJoin="miter";
 	ctx.miterLimit=2;
     ctx.strokeText(text, x, y);
