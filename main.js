@@ -297,7 +297,7 @@ function startTimer() {
 }
 
 function drawTimer() {
-	let currentMill = performance.now().toPrecision(4) - startTime;
+	let currentMill = performance.now() - startTime;
 
 	let minutes = ('0' + Math.floor(currentMill/60000)).slice(-2);
 	let seconds = ('0' + Math.floor((currentMill%60000)/1000)).slice(-2);
