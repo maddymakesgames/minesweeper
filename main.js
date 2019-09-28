@@ -281,7 +281,6 @@ function optionsClick(x, y) {
 function updateBoardDims(x, y) {
 	currentDims[0] += x;
 	currentDims[1] += y;
-
 	timer = false;
 	if(bombCount > (currentDims[0]*currentDims[1])/6) while(bombCount > (currentDims[0]*currentDims[1])/6) {bombCount--;}
 	for (let i = 0; i < currentDims[1]; i++) {
@@ -294,7 +293,7 @@ function updateBombCount(num) {
 	bombCount += num;
 
 	if(bombCount > (currentDims[0]*currentDims[1])/6) while(bombCount > (currentDims[0]*currentDims[1])/6) {bombCount--;}
-	for (let i = 0; i < game.length; i++) {
+	for (let i = 0; i < currentDims[1]; i++) {
 		revealed[i] = []
 	}
 	updateSize();
