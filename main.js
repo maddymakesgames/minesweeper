@@ -261,6 +261,14 @@ function drawOptions() {
 	}
 }
 
+function updateOptions() {
+	for (let rectNum = 0; rectNum < 2; rectNum++) {
+		let xTextSize = ((optionsRect[2] / 32) * 15) / (currentDims[rectNum].toString().length * 2);
+		ctx.font = `${xTextSize}px Comic Sans`;
+		ctx.fillText(currentDims[rectNum], (scaleRect[0]) * 1.04 + ((scaleRect[2]) / 3) - (currentDims[0].toString().length * xTextSize) / 5, scaleRect[1] + scaleRect[3] * (0.6 + (rectNum * 2) + 1));
+	}
+}
+
 function optionsClick(x, y) {
 	let updateSizeWidth = ((scaleRect[2]) / 3);
 	if (x - scaleRect[0] > 0 && x - scaleRect[0] < updateSizeWidth && y - scaleRect[1] - scaleRect[3] < scaleRect[3] && y - scaleRect[1] - scaleRect[3] > 0) updateBoardDims(-1, 0);
@@ -287,7 +295,7 @@ function updateBoardDims(x, y, set = false) {
 	}
 	updateSize();
 	requestAnimationFrame(drawBoard);
-	requestAnimationFrame(drawOptions);
+	requestAnimationFrame(updateOptions);
 }
 
 function startTimer() {
